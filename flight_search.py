@@ -20,7 +20,6 @@ class FlightSearch:
         "location_types":"airport"}
         response = requests.get(url = tq_url, params = parameters, headers = header)
         code = response.json()['locations'][0]['city']['code']
-        print(code)
         return code
 
     def find_flight(self, destination_airport_code, **kwargs):
@@ -34,7 +33,6 @@ class FlightSearch:
         nights_in_dst_from = kwargs.get("nights_in_dst_from", 2)
         nights_in_dst_to = kwargs.get("nights_in_dst_to", 21)
         flight_type = kwargs.get("flight_type", "round")
-        print(str(destination_airport_code))
         tq_url = f"{tq_endpoint}/v2/search"
         parameters = {
             "fly_from": departure_airport_code,

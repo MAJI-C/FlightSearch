@@ -1,31 +1,38 @@
 from configure import configure
 import os
-import requests
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
 
 configure()
 
-sheety_endpoint = os.getenv("SHT_ENDPOINT")
-myToken = os.getenv("SHT_TOKEN")
-bearer_headers = {
-"Authorization": myToken,
-}
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_ACCOUNT_FILE")
+#   The ID and range of a sample spreadsheet.
+SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")
+RANGE_NAME = "iata!A1:C"
+
 
 class DataManager:
     def __init__(self):
-        response = requests.get(url = sheety_endpoint, headers=bearer_headers)
-        print(response.status_code)
-        self.data = response.json()['iata']
-    
-    def edit_cell(self, id, **kwargs):
-        for var_name, var_value in kwargs.items():
-            json_data = {
-                "iata": {
-                var_name: var_value,
-                }
-            }
-            endpoint = f"{sheety_endpoint}/{id}"
-            response = requests.put(url=endpoint, json=json_data,headers=bearer_headers)
-            print(response.status_code)
+        creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+        service = build('sheets', 'v4', credentials=creds)
+        self.sheet = service.spreadsheets()
 
+
+    def call_spreadsheet_api(self):
+        result = self.sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=RANGE_NAME).execute()
+        values = result.get('values', [])
+        return values
+
+    def get_cell_value(self, cell):
+        result = self.sheet.values().get(spreadsheetId=SPREADSHEET_ID,range=cell).execute()
+        values = result.get('values')
+        return values
+    
+    def update_cells(self, upd_range, upd_values):
+        request = self.sheet.values().update(spreadsheetId = SPREADSHEET_ID, range = upd_range, valueInputOption = "USER_ENTERED", body = {"values": upd_values}).execute()
+        print(request)
+
+    
 
 
