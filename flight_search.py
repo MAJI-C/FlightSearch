@@ -9,7 +9,7 @@ tq_kiwi_api_key = os.getenv("TQ_KIWI_API_KEY")
 header = {
     "apikey":tq_kiwi_api_key,
         }
-
+#https://tequila.kiwi.com/portal/docs/tequila_api/search_api
 class FlightSearch:    
         
     def get_city_code(self, name):
@@ -53,7 +53,3 @@ class FlightSearch:
             return None
         else:
             return flight
-
-        
-
-

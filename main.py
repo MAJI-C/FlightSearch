@@ -13,5 +13,3 @@ if sheet_data[0]["code"]=="":
         code = flight_search.get_city_code(city)
         price = flight_search.find_flight(code)
         data_manager.edit_cell(id, code = code, price = price)
-
-
