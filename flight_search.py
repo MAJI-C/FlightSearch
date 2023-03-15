@@ -45,7 +45,7 @@ class FlightSearch:
             }
         response = requests.get(url=tq_url, params = parameters, headers = header)
         try:
-            flight = response.json()["data"][0]["price"]
+            flight = response.json()["data"][0]
         except IndexError:
             print(f"No flights found for {destination_airport_code}.")
             return None

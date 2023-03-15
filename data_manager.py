@@ -32,7 +32,11 @@ class DataManager:
     def update_cells(self, upd_range, upd_values):
         request = self.sheet.values().update(spreadsheetId = SPREADSHEET_ID, range = upd_range, valueInputOption = "USER_ENTERED", body = {"values": upd_values}).execute()
         print(request)
-
+    
+    def get_column_values(self, range_names):
+        result = self.sheet.values().batchGet(spreadsheetId = SPREADSHEET_ID, ranges = range_names).execute()
+        ranges = result.get('valueRanges')[0].get('values')
+        return ranges
     
 
 
