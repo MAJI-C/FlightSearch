@@ -2,6 +2,7 @@ from configure import configure
 import os
 import requests
 import datetime
+from flight_data import FlightData
 
 configure()
 tq_endpoint = "https://api.tequila.kiwi.com"
@@ -33,7 +34,10 @@ class FlightSearch:
         nights_in_dst_from = kwargs.get("nights_in_dst_from", 2)
         nights_in_dst_to = kwargs.get("nights_in_dst_to", 21)
         flight_type = kwargs.get("flight_type", "round")
+        max_stopovers = kwargs.get("max_stopovers", 0)
+
         tq_url = f"{tq_endpoint}/v2/search"
+
         parameters = {
             "fly_from": departure_airport_code,
             "fly_to": str(destination_airport_code),
@@ -42,12 +46,28 @@ class FlightSearch:
             "nights_in_dst_from": nights_in_dst_from,
             "nights_in_dst_to": nights_in_dst_to,
             "flight_type": flight_type,
+            "max_stopovers": max_stopovers,
             }
         response = requests.get(url=tq_url, params = parameters, headers = header)
+
         try:
             flight = response.json()["data"][0]
+
         except IndexError:
-            print(f"No flights found for {destination_airport_code}.")
             return None
         else:
-            return flight
+            stops = int(len(flight["route"])/2)
+            flight_data = FlightData(
+                price=flight["price"],
+                origin_city=flight["cityFrom"],
+                origin_airport=flight["flyFrom"],
+                destination_city=flight["cityTo"],
+                destination_airport=flight["flyTo"],
+                destination_country = flight["countryTo"]["name"],
+                nights_in_dest = flight["nightsInDest"],
+                out_date=flight["route"][0]["local_departure"].split("T")[0],
+                return_date=flight["route"][stops]["local_departure"].split("T")[0],
+                stop_overs = stops - 1,
+                via_city = flight["route"][stops]["cityFrom"]
+            )
+            return flight_data
