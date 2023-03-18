@@ -34,6 +34,4 @@ for destination in sheet_values[1:]:
         
         if flight.stop_overs > 0:
             msg += f"\n\nFlight has {flight.stop_overs}, via {flight.via_city}."
-        link = f"https://www.google.co.uk/flights?hl=en#flt={flight.origin_airport}.{flight.destination_airport}.{flight.out_date}*{flight.destination_airport}.{flight.origin_airport}.{flight.return_date}"
         print(msg)
-        print(link)
